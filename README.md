@@ -40,3 +40,4 @@ Run (dev)
 ```bash
 python -m uvicorn app.main:app --reload
 ```
+API runs at http://127.0.0.1:8000
