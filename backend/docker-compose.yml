@@ -1,0 +1,12 @@
+services:
+  sata_commhealth_backend:
+    build: .
+    container_name: sata_commhealth_backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      GOOGLE_GENAI_API_KEY: ${GOOGLE_GENAI_API_KEY}
+      # You can add other envs, e.g. LOG_LEVEL or APP_ENV if needed
+    volumes:
+      - .:/app
