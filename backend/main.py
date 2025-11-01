@@ -3,6 +3,7 @@ import os
 from typing import Optional
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from google import genai
 from langchain_core.prompts import ChatPromptTemplate
@@ -26,6 +27,12 @@ if not GOOGLE_GENAI_API_KEY:
 # Model choice: Gemini 2.5 Flash Image (aka Nano Banana)
 GEMINI_IMAGE_MODEL = "gemini-2.5-flash-image"
 GEMINI_TEXT_MODEL = "gemini-2.5-flash"
+
+ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000").split(",")
+    if origin.strip()
+]
 
 # -----------------------------
 # LangChain Setup with Gemini
@@ -64,6 +71,14 @@ PROMPT_TEMPLATE = ChatPromptTemplate.from_messages(
 # FastAPI Setup
 # -----------------------------
 app = FastAPI(title="SATA CommHealth Collateral Image Service")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=ALLOWED_ORIGINS or ["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 class PromptRequest(BaseModel):
