@@ -7,6 +7,7 @@ services:
       - "8000:8000"
     environment:
       GOOGLE_GENAI_API_KEY: ${GOOGLE_GENAI_API_KEY}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS}
       # You can add other envs, e.g. LOG_LEVEL or APP_ENV if needed
     volumes:
       - .:/app

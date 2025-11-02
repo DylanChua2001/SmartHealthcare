@@ -29,10 +29,7 @@ GEMINI_TEXT_MODEL = "gemini-2.5-flash"
 
 ALLOWED_ORIGINS = [
     origin.strip()
-    for origin in os.getenv(
-        "ALLOWED_ORIGINS",
-        "http://localhost:3000,http://127.0.0.1:3000"
-    ).split(",")
+    for origin in os.getenv("ALLOWED_ORIGINS", "").split(",")
     if origin.strip()
 ]
 
@@ -70,45 +67,61 @@ LAYOUT_PROMPT = ChatPromptTemplate.from_messages([
 
 CAPTION_PROMPT = ChatPromptTemplate.from_messages([
     ("system",
-     "You are a healthcare copywriter crafting concise, emotionally engaging poster text for SATA CommHealth campaigns. "
-     "Your writing style should be clear, warm, and motivating — suitable for public awareness, preventive health, and community care. "
+     "You are a healthcare copywriter creating emotionally engaging and trustworthy copy for SATA CommHealth Singapore's physical collaterals — posters, brochures, banners, and community displays. "
+     "Your writing must reflect SATA CommHealth's mission of accessible, preventive, and community-based healthcare for all. "
+     "The tone and language should adapt to the user-provided writing_style, ensuring consistency in mood, emotional weight, and communication intent. "
+     "Avoid jargon, exaggerated marketing language, or impersonal phrasing. "
+     "Your goal is to make healthcare communication feel human, sincere, and action-oriented — suitable for public audiences in Singapore. "
      "Return ONLY valid JSON — no markdown, code blocks, or explanations."),
+    
     ("user",
      "Core Idea:\n{core_idea}\n"
      "Target Audience:\n{audience}\n"
-     "Tone & Style:\n{writing_style}\n\n"
-     "Generate a short, natural-language caption set in JSON format:\n"
+     "Tone & Style (use this to guide tone, rhythm, and emotional colour):\n{writing_style}\n\n"
+     "Generate a natural-language caption set in JSON format:\n"
      "{{\n"
      "  \"headline\": \"...\",\n"
      "  \"tagline\": \"...\",\n"
      "  \"cta\": \"...\"\n"
      "}}\n\n"
-     "Rules:\n"
-     "- Keep the headline under 8 words.\n"
-     "- Make the tagline supportive and empathetic.\n"
-     "- Keep the CTA direct, community-oriented, and free of jargon.")
+     "Creative Guidelines:\n"
+     "- Headline: Up to 8 words. Clear, uplifting, and emotionally resonant. Should capture attention quickly and express the campaign's core message.\n"
+     "- Tagline: Can be longer and expressive. Reinforce the key message with empathy, care, or reassurance. Expand on the idea with emotional depth that complements the headline.\n"
+     "- CTA (Call To Action): Can also be longer and conversational — inviting real-world participation, community care, or preventive action. For example, 'Book your screening at the nearest SATA clinic today' or 'Talk to our care team to learn more.'\n"
+     "- The tone must align with the specified writing_style. If the style is 'friendly and reassuring', reflect warmth; if it is 'professional and empowering', convey confidence and clarity.\n"
+     "- Use plain, inclusive language that feels natural in Singapore's multicultural context.\n"
+     "- Maintain warmth and sincerity throughout — embody SATA CommHealth's identity as trusted, community-focused healthcare close to your heart.")
 ])
 
 DIRECT_IMAGE_PROMPT = """
-Create a photorealistic healthcare campaign image for SATA CommHealth Singapore.
+Create a highly photorealistic healthcare campaign image for SATA CommHealth Singapore.
 
 Core Message: {core_idea}
 Target Audience: {audience}
 
 Creative Direction:
-- Depict authentic, diverse Singaporean individuals (Chinese, Malay, Indian, and others) engaging in positive healthcare-related interactions.
-- Scene should feel distinctly local — e.g., HDB heartland settings, community clinics, wellness centers, neighborhood parks, or home environments.
-- Emphasize empathy, trust, and community connection. The tone should be warm, hopeful, and caring.
-- Lighting: soft, natural daylight with realistic shadows and textures.
-- Mood: friendly, uplifting, and genuine — avoid overly posed or stock-like imagery.
-- Wardrobe: realistic Singaporean everyday wear; healthcare professionals in SATA CommHealth-style uniforms (light blue/teal tones, professional but approachable).
-- Composition: cinematic realism, inspired by Canon EOS R6 with a 50mm lens — shallow depth of field, lifelike bokeh, balanced focus.
-- Include clean **negative space** within the frame (e.g., blank wall, sky, or blurred background area) where text or campaign messages can later be placed.
-- **Do not include any visible words, logos, or text** in the image itself.
-- Ensure the image looks like a genuine professional photo taken in Singapore, ready for use in posters, brochures, or social media collateral.
+- Depict authentic, diverse Singaporean individuals (Chinese, Malay, Indian, and others) engaging in warm, positive healthcare interactions — e.g. a friendly consultation, home visit, health screening, or physiotherapy session. 
+- The setting should feel distinctly local: HDB heartland clinics, community centres, wellness spaces, or neighbourhood parks.
+- Emphasize empathy, trust, and connection between people. Tone: warm, genuine, hopeful.
+- Lighting: soft, natural daylight; realistic colour temperature and shadows.
+- Mood: calm, uplifting, human — avoid stock-photo posing.
+- Wardrobe: realistic Singaporean everyday wear; healthcare professionals in SATA CommHealth-style uniforms (light blue / teal tones).
+- Composition: cinematic realism inspired by Canon EOS R6 + 50 mm lens — shallow depth of field, natural bokeh, balanced focus.
+- Include clean **negative space** (e.g. blank wall, sky, or softly blurred background) where campaign text could be placed later.
+- **Do not** include any visible words, logos, or text.
+
+Medical Context Guidelines:
+- If medical equipment appears (e.g. stethoscopes, diagnostic tools, thermometers, blood-pressure cuffs, or wheelchairs), it must look **accurate, fully formed, and physically consistent** — proportional to human scale, clearly recognisable, and naturally positioned.
+- Prefer subtle, realistic cues of healthcare rather than close-ups of devices.
+- If realism cannot be guaranteed, imply the context through **environmental details** (e.g. clinic interior, patient charts, gentle gesture of a check-up) instead of showing equipment directly.
+
+Output Style:
+- Render with photographic clarity, correct anatomy, and lifelike materials and lighting.
+- No distortions, deformations, or surreal artefacts.
+- The image should look like a genuine professional photo taken in Singapore, ready for use in posters, brochures, or social media collateral.
 
 Overall Theme:
-Reflect SATA CommHealth’s values — trusted community healthcare that’s “close to your heart.”
+Reflect SATA CommHealth’s values — trusted community healthcare that’s *close to your heart*.
 """
 
 

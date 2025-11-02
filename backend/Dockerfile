@@ -27,7 +27,8 @@ COPY . .
 EXPOSE 8000
 
 # Default environment variable placeholder for Google GenAI key
-ENV GOOGLE_GENAI_API_KEY=""
+ENV GOOGLE_GENAI_API_KEY="" \
+    ALLOWED_ORIGINS="http://localhost:3000,http://127.0.0.1:3000"
 
 # Run app
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

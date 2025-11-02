@@ -46,6 +46,14 @@ export function EditorPage({ content, onBack }: EditorPageProps) {
   const [posterSize, setPosterSize] = useState("A4")
   const [orientation, setOrientation] = useState<"portrait" | "landscape">("portrait")
 
+  // 🆕 Image editing states
+  const [cornerRadius, setCornerRadius] = useState(0)
+  const [isCropping, setIsCropping] = useState(false)
+  const [cropRectId, setCropRectId] = useState<string | null>(null)
+
+  // 🆕 Text rounding state
+  const [textCornerRadius, setTextCornerRadius] = useState(0)
+
   // Paper sizes
   const BASE_SIZES: Record<string, { w: number; h: number }> = {
     Letter: { w: 816, h: 1056 },
@@ -63,10 +71,24 @@ export function EditorPage({ content, onBack }: EditorPageProps) {
   // Initialize canvas
   useEffect(() => {
     if (!canvasRef.current) return
+
+    const pixelRatio = window.devicePixelRatio || 1
+    const { w, h } = getCanvasDimensions()
+
+    // Set internal bitmap size to higher resolution
+    canvasRef.current.width = w * pixelRatio
+    canvasRef.current.height = h * pixelRatio
+    canvasRef.current.style.width = `${w}px`
+    canvasRef.current.style.height = `${h}px`
+
     const c = new fabric.Canvas(canvasRef.current, {
       backgroundColor: "#111827",
       preserveObjectStacking: true,
     })
+
+    // Apply zoom so content aligns visually
+    c.setZoom(pixelRatio)
+
     setCanvas(c)
     return () => c.dispose()
   }, [])
@@ -163,7 +185,7 @@ export function EditorPage({ content, onBack }: EditorPageProps) {
       setSelectedObject(obj)
       if (obj && obj.type === "textbox") {
         const tb = obj as fabric.Textbox
-        setFontColor(tb.fill as string)
+        setFontColor((tb.fill as string) || "#ffffff")
         setFontSize(tb.fontSize || 24)
         setFontFamily(tb.fontFamily || "Helvetica")
         setTextAlign(tb.textAlign || "left")
@@ -247,13 +269,143 @@ export function EditorPage({ content, onBack }: EditorPageProps) {
     }
   }
 
-  const handleExportPNG = () => {
+  const handleExportPrintQuality = () => {
     if (!canvas) return
-    const dataUrl = canvas.toDataURL({ format: "png" })
+    const dpi = 300
+    const base = BASE_SIZES[posterSize]
+    const { w, h } =
+      orientation === "portrait" ? { w: base.w, h: base.h } : { w: base.h, h: base.w }
+
+    // Convert px → inches (Fabric default ~96 PPI)
+    const pxPerInch = 96
+    const scale = (dpi / pxPerInch)
+
+    const dataUrl = canvas.toDataURL({
+      format: "png",
+      multiplier: scale,
+    })
+
     const link = document.createElement("a")
-    link.download = "poster.png"
+    link.download = `poster_${posterSize}_${dpi}dpi.png`
     link.href = dataUrl
     link.click()
+  }
+
+  // 🆕 Rounded corners for images (clipPath)
+  const handleApplyRounding = () => {
+    if (selectedObject && selectedObject.type === "image") {
+      const img = selectedObject as fabric.Image
+
+      // clipPath must be in image's coordinate space
+      const rect = new fabric.Rect({
+        width: (img.width || 0),
+        height: (img.height || 0),
+        rx: cornerRadius,
+        ry: cornerRadius,
+        originX: "center",
+        originY: "center",
+      })
+      img.set("clipPath", rect)
+      canvas?.renderAll()
+    }
+  }
+
+  // 🆕 Rounded corners for text boxes
+  const handleApplyTextRounding = () => {
+    if (selectedObject && selectedObject.type === "textbox") {
+      const tb = selectedObject as fabric.Textbox
+
+      const rect = new fabric.Rect({
+        width: tb.getScaledWidth() / (tb.scaleX || 1),
+        height: tb.getScaledHeight() / (tb.scaleY || 1),
+        rx: textCornerRadius,
+        ry: textCornerRadius,
+        originX: "center",
+        originY: "center",
+      })
+
+      tb.set("clipPath", rect)
+      canvas?.renderAll()
+    }
+  }
+
+  // 🆕 Cropping (via clipping)
+  const handleCropStart = () => {
+    if (!canvas || !selectedObject || selectedObject.type !== "image") return
+    setIsCropping(true)
+
+    const img = selectedObject as fabric.Image
+    // create a temp rect on top of image
+    const rect = new fabric.Rect({
+      left: img.left,
+      top: img.top,
+      width: 150,
+      height: 150,
+      fill: "rgba(255,255,255,0.2)",
+      stroke: "red",
+      strokeDashArray: [5, 5],
+      selectable: true,
+      hasBorders: true,
+      hasControls: true,
+      name: "__cropRect",
+    })
+
+    canvas.add(rect)
+    canvas.setActiveObject(rect)
+    canvas.renderAll()
+    setCropRectId(rect.id || "__cropRect")
+  }
+
+  const handleCropApply = () => {
+    if (!canvas || !selectedObject || selectedObject.type !== "image") return
+
+    // find crop rect
+    let cropRect: fabric.Rect | null = null
+    canvas.getObjects().forEach((obj) => {
+      if (obj.type === "rect" && (obj as any).name === "__cropRect") {
+        cropRect = obj as fabric.Rect
+      }
+    })
+
+    if (!cropRect) {
+      setIsCropping(false)
+      return
+    }
+
+    const img = selectedObject as fabric.Image
+
+    // convert canvas rect (absolute) -> image local coords
+    const imgLeft = img.left || 0
+    const imgTop = img.top || 0
+    const imgScaleX = img.scaleX || 1
+    const imgScaleY = img.scaleY || 1
+
+    const rectLeftCanvas = cropRect.left || 0
+    const rectTopCanvas = cropRect.top || 0
+    const rectWidthCanvas = cropRect.width! * (cropRect.scaleX || 1)
+    const rectHeightCanvas = cropRect.height! * (cropRect.scaleY || 1)
+
+    // position of rect relative to image (in image's unscaled space)
+    const relLeft = (rectLeftCanvas - imgLeft) / imgScaleX
+    const relTop = (rectTopCanvas - imgTop) / imgScaleY
+    const relWidth = rectWidthCanvas / imgScaleX
+    const relHeight = rectHeightCanvas / imgScaleY
+
+    const clipRect = new fabric.Rect({
+      left: relLeft,
+      top: relTop,
+      width: relWidth,
+      height: relHeight,
+      originX: "left",
+      originY: "top",
+    })
+
+    img.set("clipPath", clipRect)
+    canvas.remove(cropRect)
+    canvas.setActiveObject(img)
+    canvas.renderAll()
+    setIsCropping(false)
+    setCropRectId(null)
   }
 
   const { w, h } = getCanvasDimensions()
@@ -275,7 +427,19 @@ export function EditorPage({ content, onBack }: EditorPageProps) {
         </div>
 
         {/* Sidebar */}
-        <aside className="lg:min-w-[320px] lg:max-w-[380px] flex-shrink-0 bg-slate-900 border border-slate-700 rounded p-4 flex flex-col overflow-y-auto max-h-[calc(100vh-6rem)]">
+<aside
+  className="
+    w-[300px] 
+    h-[calc(100vh-6rem)] 
+    flex-shrink-0 
+    bg-slate-900 
+    border border-slate-700 
+    rounded 
+    p-4 
+    flex flex-col 
+    overflow-y-auto
+  "
+>
           <div className="sticky top-0 bg-slate-900 pb-3 z-10">
             <h2 className="font-semibold text-lg">Controls</h2>
           </div>
@@ -315,9 +479,9 @@ export function EditorPage({ content, onBack }: EditorPageProps) {
             <Input id="upload" type="file" accept="image/*" onChange={handleUploadImage} />
           </div>
 
+          {/* Text editing controls */}
           {selectedObject && selectedObject.type === "textbox" ? (
             <div className="space-y-3 pt-4 border-t border-slate-700">
-              {/* Text editing controls (unchanged) */}
               <Label>Edit Text</Label>
               <Input
                 value={(selectedObject as fabric.Textbox).text || ""}
@@ -360,7 +524,6 @@ export function EditorPage({ content, onBack }: EditorPageProps) {
                 </Button>
               </div>
 
-              {/* color, stroke, shadow, etc (same as before) */}
               <Label>Font Color</Label>
               <Input
                 type="color"
@@ -483,12 +646,66 @@ export function EditorPage({ content, onBack }: EditorPageProps) {
                 <option value="center">Center</option>
                 <option value="right">Right</option>
               </select>
+
+              {/* 🆕 Text rounding controls */}
+              <Label className="mt-2">Text Corner Radius</Label>
+              <input
+                type="range"
+                min={0}
+                max={40}
+                step={1}
+                value={textCornerRadius}
+                onChange={(e) => setTextCornerRadius(Number(e.target.value))}
+                className="w-full accent-blue-500"
+              />
+              <Button className="w-full" onClick={handleApplyTextRounding}>
+                Apply Text Rounding
+              </Button>
             </div>
           ) : (
-            <p className="text-slate-400 text-sm italic mt-2">
-              Select a text box to edit
-            </p>
+            <p className="text-slate-400 text-sm italic mt-2">Select a text box to edit</p>
           )}
+
+          {/* 🆕 Image Controls */}
+          <div className="pt-4 border-t border-slate-700 space-y-2">
+            <h3 className="font-semibold text-md mt-3">Image Controls</h3>
+
+            {selectedObject && selectedObject.type === "image" ? (
+              <>
+                <Label>Corner Radius</Label>
+                <input
+                  type="range"
+                  min={0}
+                  max={120}
+                  step={1}
+                  value={cornerRadius}
+                  onChange={(e) => setCornerRadius(Number(e.target.value))}
+                  className="w-full accent-blue-500"
+                />
+                <Button className="w-full" onClick={handleApplyRounding}>
+                  Apply Image Rounding
+                </Button>
+
+                {!isCropping ? (
+                  <Button
+                    className="w-full bg-yellow-600 hover:bg-yellow-700"
+                    onClick={handleCropStart}
+                  >
+                    ✂ Start Cropping
+                  </Button>
+                ) : (
+                  <Button
+                    className="w-full bg-green-600 hover:bg-green-700"
+                    onClick={handleCropApply}
+                  >
+                    ✅ Apply Crop (Clip)
+                  </Button>
+                )}
+              </>
+            ) : (
+              <p className="text-slate-400 text-sm italic">Select an image to edit</p>
+            )}
+          </div>
 
           <div className="pt-4 border-t border-slate-700 space-y-2">
             <Button className="w-full" onClick={bringFront}>
@@ -522,10 +739,10 @@ export function EditorPage({ content, onBack }: EditorPageProps) {
           variant="outline"
           className="border-slate-600 text-white hover:bg-slate-700"
         >
-          ← Back
+          Back
         </Button>
         <Button
-          onClick={handleExportPNG}
+          onClick={handleExportPrintQuality}
           className="bg-blue-600 hover:bg-blue-700 text-white"
         >
           Export PNG
