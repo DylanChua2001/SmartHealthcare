@@ -100,28 +100,31 @@ Core Message: {core_idea}
 Target Audience: {audience}
 
 Creative Direction:
-- Depict authentic, diverse Singaporean individuals (Chinese, Malay, Indian, and others) engaging in warm, positive healthcare interactions — e.g. a friendly consultation, home visit, health screening, or physiotherapy session. 
-- The setting should feel distinctly local: HDB heartland clinics, community centres, wellness spaces, or neighbourhood parks.
-- Emphasize empathy, trust, and connection between people. Tone: warm, genuine, hopeful.
-- Lighting: soft, natural daylight; realistic colour temperature and shadows.
-- Mood: calm, uplifting, human — avoid stock-photo posing.
-- Wardrobe: realistic Singaporean everyday wear; healthcare professionals in SATA CommHealth-style uniforms (light blue / teal tones).
+- Show authentic, diverse Singaporean individuals (Chinese, Malay, Indian, and others) in a warm, human healthcare moment — conversation, reassurance, or community support.
+- The setting should feel distinctly Singaporean: HDB heartland clinic, community health centre, or bright home environment.
+- Focus entirely on empathy, approachability, and trust — **no visible medical instruments, devices, or diagnostic equipment** of any kind.
+- Lighting: soft natural daylight, realistic shadows, lifelike skin tones.
+- Mood: caring, hopeful, genuine — avoid stock-photo staging.
+- Wardrobe: everyday Singaporean attire; SATA CommHealth-style uniforms (light blue / teal).
 - Composition: cinematic realism inspired by Canon EOS R6 + 50 mm lens — shallow depth of field, natural bokeh, balanced focus.
-- Include clean **negative space** (e.g. blank wall, sky, or softly blurred background) where campaign text could be placed later.
-- **Do not** include any visible words, logos, or text.
+- Include clean negative space (blank wall, softly blurred background, sky, or window light) for later placement of campaign text.
+- **Do not** include any visible words, text, or logos in the image.
 
-Medical Context Guidelines:
-- If medical equipment appears (e.g. stethoscopes, diagnostic tools, thermometers, blood-pressure cuffs, or wheelchairs), it must look **accurate, fully formed, and physically consistent** — proportional to human scale, clearly recognisable, and naturally positioned.
-- Prefer subtle, realistic cues of healthcare rather than close-ups of devices.
-- If realism cannot be guaranteed, imply the context through **environmental details** (e.g. clinic interior, patient charts, gentle gesture of a check-up) instead of showing equipment directly.
+Print & Technical Quality:
+- Shot composition suitable for A4 poster print — centre-weighted subject framing with safe margins.
+- Maintain realistic perspective and anatomy; no artifacts, no deformities.
+- Photographic fidelity suitable for professional offset or high-resolution digital printing (300 DPI equivalent).
+
+Medical Context Handling:
+- Convey healthcare subtly through environment and human connection (e.g. staff badge, clinic background, interaction posture).
+- If the model cannot render equipment with full realism, **omit it entirely** — rely on gesture and context instead.
 
 Output Style:
-- Render with photographic clarity, correct anatomy, and lifelike materials and lighting.
-- No distortions, deformations, or surreal artefacts.
-- The image should look like a genuine professional photo taken in Singapore, ready for use in posters, brochures, or social media collateral.
+- True photographic realism, accurate materials and lighting.
+- The final image should appear as an authentic professional photo taken in Singapore, ready for direct print or campaign use.
 
 Overall Theme:
-Reflect SATA CommHealth’s values — trusted community healthcare that’s *close to your heart*.
+Reflect SATA CommHealth’s values — trusted community healthcare that’s “close to your heart.”
 """
 
 
