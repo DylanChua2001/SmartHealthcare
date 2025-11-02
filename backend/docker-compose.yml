@@ -5,9 +5,16 @@ services:
     restart: unless-stopped
     ports:
       - "8000:8000"
+
+    # 👇 Load environment variables from your .env file automatically
+    env_file:
+      - .env
+
+    # (optional) still allow overrides via environment block if needed
     environment:
+      # If you want, you can keep these — they’ll override .env if defined
       GOOGLE_GENAI_API_KEY: ${GOOGLE_GENAI_API_KEY}
       ALLOWED_ORIGINS: ${ALLOWED_ORIGINS}
-      # You can add other envs, e.g. LOG_LEVEL or APP_ENV if needed
+
     volumes:
       - .:/app

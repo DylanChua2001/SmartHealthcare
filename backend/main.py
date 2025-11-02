@@ -96,35 +96,41 @@ CAPTION_PROMPT = ChatPromptTemplate.from_messages([
 DIRECT_IMAGE_PROMPT = """
 Create a highly photorealistic healthcare campaign image for SATA CommHealth Singapore.
 
-Core Message: {core_idea}
-Target Audience: {audience}
+Core Message:
+{core_idea}
+
+Target Audience:
+{audience}
 
 Creative Direction:
-- Show authentic, diverse Singaporean individuals (Chinese, Malay, Indian, and others) in a warm, human healthcare moment — conversation, reassurance, or community support.
-- The setting should feel distinctly Singaporean: HDB heartland clinic, community health centre, or bright home environment.
-- Focus entirely on empathy, approachability, and trust — **no visible medical instruments, devices, or diagnostic equipment** of any kind.
-- Lighting: soft natural daylight, realistic shadows, lifelike skin tones.
-- Mood: caring, hopeful, genuine — avoid stock-photo staging.
-- Wardrobe: everyday Singaporean attire; SATA CommHealth-style uniforms (light blue / teal).
-- Composition: cinematic realism inspired by Canon EOS R6 + 50 mm lens — shallow depth of field, natural bokeh, balanced focus.
-- Include clean negative space (blank wall, softly blurred background, sky, or window light) for later placement of campaign text.
-- **Do not** include any visible words, text, or logos in the image.
+Show authentic, diverse Singaporean individuals — Chinese, Malay, Indian, and others — in a warm, caring healthcare interaction such as a consultation, reassurance, or gentle guidance.  
+The scene takes place in a recognisable Singaporean setting: an HDB clinic, community health centre, or bright home.
 
-Print & Technical Quality:
-- Shot composition suitable for A4 poster print — centre-weighted subject framing with safe margins.
-- Maintain realistic perspective and anatomy; no artifacts, no deformities.
-- Photographic fidelity suitable for professional offset or high-resolution digital printing (300 DPI equivalent).
+Highlight empathy, trust, and human connection.  
+Avoid prominent or intrusive medical equipment; subtle cues are acceptable — such as a staff ID badge, blurred clinic signage, or consultation desk details.  
+Lighting should be soft natural daylight with realistic shadows and lifelike skin tones.
 
-Medical Context Handling:
-- Convey healthcare subtly through environment and human connection (e.g. staff badge, clinic background, interaction posture).
-- If the model cannot render equipment with full realism, **omit it entirely** — rely on gesture and context instead.
+Mood: compassionate, hopeful, and genuine — avoid stiff or posed imagery.  
+
+Wardrobe:
+SATA CommHealth staff must wear the **official SATA CommHealth uniform** — 
+a navy-blue polo shirt with teal collar and sleeve trim, featuring the SATA CommHealth logo on the left chest, 
+paired with dark trousers or skirt. 
+The uniform should look neat, professional, and community-friendly — not hospital scrubs or white coats.  
+Patients or community members should wear casual, everyday Singaporean attire.
+
+Composition:
+Cinematic realism with shallow depth of field, soft background blur, and balanced framing.  
+Include clean space (wall, window light, or softly blurred background) for campaign text.  
+No visible text or logos in the image.
+
+Print & Quality:
+Centre-weighted framing for A4 poster print with safe margins.  
+Maintain accurate proportions, perspective, and natural expression.  
+High-fidelity realism suitable for 300 DPI professional print.
 
 Output Style:
-- True photographic realism, accurate materials and lighting.
-- The final image should appear as an authentic professional photo taken in Singapore, ready for direct print or campaign use.
-
-Overall Theme:
-Reflect SATA CommHealth’s values — trusted community healthcare that’s “close to your heart.”
+True photographic realism that feels authentically Singaporean — conveying SATA CommHealth’s spirit of trusted community healthcare “close to your heart.”
 """
 
 
