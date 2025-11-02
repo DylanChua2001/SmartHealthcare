@@ -78,7 +78,7 @@ export function CampaignWizard() {
       <div className="max-w-7xl mx-auto px-4 py-8 flex-1 w-full">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">Canva-AI Generator</h1>
+          <h1 className="text-4xl font-bold text-white mb-2">SATA Collateral Generator</h1>
           <p className="text-slate-400">Create healthcare campaign collateral powered by AI</p>
         </div>
 
