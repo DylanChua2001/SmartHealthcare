@@ -113,10 +113,10 @@ Lighting should be soft natural daylight with realistic shadows and lifelike ski
 Mood: compassionate, hopeful, and genuine — avoid stiff or posed imagery.  
 
 Wardrobe:
-SATA CommHealth staff must wear the **official SATA CommHealth uniform** — 
-a navy-blue polo shirt with teal collar and sleeve trim, featuring the SATA CommHealth logo on the left chest, 
-paired with dark trousers or skirt. 
-The uniform should look neat, professional, and community-friendly — not hospital scrubs or white coats.  
+SATA CommHealth staff must wear the official SATA CommHealth uniform —
+a navy-blue polo shirt with teal collar and sleeve trim, featuring the words “sata” above “CommHealth” printed on the left chest both in white,
+paired with dark trousers or skirt.
+The uniform should appear neat, professional, and community-oriented — not hospital scrubs or white coats.
 Patients or community members should wear casual, everyday Singaporean attire.
 
 Composition:
