@@ -70,27 +70,34 @@ export function EditorPage({ content, onBack }: EditorPageProps) {
 
   // Initialize canvas
   useEffect(() => {
-    if (!canvasRef.current) return
+    const setupCanvas = async () => {
+      if (!canvasRef.current) return
 
-    const pixelRatio = window.devicePixelRatio || 1
-    const { w, h } = getCanvasDimensions()
+      const pixelRatio = window.devicePixelRatio || 1
+      const { w, h } = getCanvasDimensions()
 
-    // Set internal bitmap size to higher resolution
-    canvasRef.current.width = w * pixelRatio
-    canvasRef.current.height = h * pixelRatio
-    canvasRef.current.style.width = `${w}px`
-    canvasRef.current.style.height = `${h}px`
+      canvasRef.current.width = w * pixelRatio
+      canvasRef.current.height = h * pixelRatio
+      canvasRef.current.style.width = `${w}px`
+      canvasRef.current.style.height = `${h}px`
 
-    const c = new fabric.Canvas(canvasRef.current, {
-      backgroundColor: "#111827",
-      preserveObjectStacking: true,
-    })
+      const c = new fabric.Canvas(canvasRef.current, {
+        backgroundColor: "#111827",
+        preserveObjectStacking: true,
+      })
 
-    // Apply zoom so content aligns visually
-    c.setZoom(pixelRatio)
+      c.setZoom(pixelRatio)
+      setCanvas(c)
+    }
 
-    setCanvas(c)
-    return () => c.dispose()
+    setupCanvas()
+
+    // ✅ cleanup must be synchronous
+    return () => {
+      if (canvas) {
+        canvas.dispose()
+      }
+    }
   }, [])
 
   // Scale / resize canvas on window or orientation change
@@ -158,7 +165,7 @@ export function EditorPage({ content, onBack }: EditorPageProps) {
       cta_text: { x: 10, y: 35 },
     }
 
-    const addText = (text: string, pos: any, extra: fabric.TextboxOptions = {}) => {
+    const addText = (text: string, pos: any, extra: any = {}) => {
       const t = new fabric.Textbox(text, {
         left: (pos.x / 100) * width,
         top: (pos.y / 100) * height,
@@ -188,7 +195,7 @@ export function EditorPage({ content, onBack }: EditorPageProps) {
         setFontColor((tb.fill as string) || "#ffffff")
         setFontSize(tb.fontSize || 24)
         setFontFamily(tb.fontFamily || "Helvetica")
-        setTextAlign(tb.textAlign || "left")
+        setTextAlign((tb.textAlign as "left" | "center" | "right") || "left")
         setFontWeight((tb.fontWeight as any) || "normal")
         setFontStyle((tb.fontStyle as any) || "normal")
         setUnderline(tb.underline || false)
@@ -353,20 +360,18 @@ export function EditorPage({ content, onBack }: EditorPageProps) {
     canvas.add(rect)
     canvas.setActiveObject(rect)
     canvas.renderAll()
-    setCropRectId(rect.id || "__cropRect")
+    setCropRectId((rect as any).id || "__cropRect")
   }
 
   const handleCropApply = () => {
     if (!canvas || !selectedObject || selectedObject.type !== "image") return
 
-    // find crop rect
-    let cropRect: fabric.Rect | null = null
-    canvas.getObjects().forEach((obj) => {
-      if (obj.type === "rect" && (obj as any).name === "__cropRect") {
-        cropRect = obj as fabric.Rect
-      }
-    })
+    // ✅ Find the crop rectangle first
+    const cropRect = canvas.getObjects().find(
+      (obj) => obj.type === "rect" && (obj as any).name === "__cropRect"
+    ) as fabric.Rect | undefined
 
+    // ✅ If not found, exit
     if (!cropRect) {
       setIsCropping(false)
       return
@@ -374,7 +379,7 @@ export function EditorPage({ content, onBack }: EditorPageProps) {
 
     const img = selectedObject as fabric.Image
 
-    // convert canvas rect (absolute) -> image local coords
+    // ✅ Convert canvas rect (absolute) -> image local coords
     const imgLeft = img.left || 0
     const imgTop = img.top || 0
     const imgScaleX = img.scaleX || 1
@@ -385,7 +390,7 @@ export function EditorPage({ content, onBack }: EditorPageProps) {
     const rectWidthCanvas = cropRect.width! * (cropRect.scaleX || 1)
     const rectHeightCanvas = cropRect.height! * (cropRect.scaleY || 1)
 
-    // position of rect relative to image (in image's unscaled space)
+    // ✅ Position of rect relative to image (in image's unscaled space)
     const relLeft = (rectLeftCanvas - imgLeft) / imgScaleX
     const relTop = (rectTopCanvas - imgTop) / imgScaleY
     const relWidth = rectWidthCanvas / imgScaleX
@@ -400,6 +405,7 @@ export function EditorPage({ content, onBack }: EditorPageProps) {
       originY: "top",
     })
 
+    // ✅ Apply crop and clean up
     img.set("clipPath", clipRect)
     canvas.remove(cropRect)
     canvas.setActiveObject(img)
@@ -427,8 +433,8 @@ export function EditorPage({ content, onBack }: EditorPageProps) {
         </div>
 
         {/* Sidebar */}
-<aside
-  className="
+        <aside
+          className="
     w-[300px] 
     h-[calc(100vh-6rem)] 
     flex-shrink-0 
@@ -439,7 +445,7 @@ export function EditorPage({ content, onBack }: EditorPageProps) {
     flex flex-col 
     overflow-y-auto
   "
->
+        >
           <div className="sticky top-0 bg-slate-900 pb-3 z-10">
             <h2 className="font-semibold text-lg">Controls</h2>
           </div>

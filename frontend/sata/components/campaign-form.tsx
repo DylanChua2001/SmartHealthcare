@@ -13,6 +13,8 @@ interface CampaignFormProps {
     core_idea: string
     audience: string
     writing_style: string
+    collateral_type: "Poster", // default value
+    num_images: 1,             // default value
     sample_image_b64?: string
   }) => Promise<void>
   isLoading: boolean
@@ -45,6 +47,8 @@ export function CampaignForm({ onSubmit, isLoading }: CampaignFormProps) {
     e.preventDefault()
     onSubmit({
       ...formData,
+      collateral_type: "Poster",
+      num_images: 1,
       sample_image_b64: sampleImage,
     })
   }
